@@ -63,9 +63,21 @@ export default function App() {
   const [watched, setWatched] = useState(tempWatchedData);
 
   useEffect(() => {
-    fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=interstellar`)
-      .then((response) => response.json())
-      .then((responseData) => setMovies(responseData.Search));
+    // * Fetch Movie Data from OMDB
+    async function fetchMovies() {
+      const response = await fetch(
+        `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDBAPI}&s=interstellar`
+      );
+      const responseData = await response.json();
+      setMovies(responseData.Search);
+      console.log(movies);
+    }
+
+    fetchMovies();
+
+    return async () => {
+      // Cancel any asynchronous operations that are still in progress.
+    };
   }, []);
 
   return (
