@@ -9,6 +9,7 @@ import MovieList from "./MovieList";
 import WatchedSummary from "./WatchedSummary";
 import WatchedMoviesList from "./WatchedMoviesList";
 import Loader from "./Loader";
+import ErrorMessage from "./ErrorMessage";
 
 const tempMovieData = [
   {
@@ -61,19 +62,32 @@ export default function App() {
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState(tempWatchedData);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const movieQuery = "interstellar";
+  const movieQuery = "jfjeifjwefw";
 
   useEffect(() => {
     // * Fetch Movie Data from OMDB
     async function fetchMovies() {
-      setIsLoading(true);
-      const response = await fetch(
-        `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDBAPI}&s=${movieQuery}`
-      );
-      const responseData = await response.json();
-      setMovies(responseData.Search);
-      setIsLoading(false);
+      try {
+        setIsLoading(true);
+
+        const response = await fetch(
+          `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDBAPI}&s=${movieQuery}`
+        );
+        if (!response.ok)
+          throw new Error("Something went wrong with the fetching movie Data");
+
+        const responseData = await response.json();
+        if (responseData.Response === "False")
+          throw new Error("Movie not found, Try another movie");
+
+        setMovies(responseData?.Search);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     fetchMovies();
@@ -92,7 +106,11 @@ export default function App() {
       </NavBar>
 
       <Main>
-        <Box>{isLoading ? <Loader /> : <MovieList movies={movies} />}</Box>
+        <Box>
+          {isLoading && <Loader />}
+          {!isLoading && !error && <MovieList movies={movies} />}
+          {error && <ErrorMessage message={error} />}
+        </Box>
         <Box>
           <WatchedSummary watched={watched} />
           <WatchedMoviesList watched={watched} />
