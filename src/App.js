@@ -59,26 +59,34 @@ const tempWatchedData = [
 ];
 
 export default function App() {
+  const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState(tempWatchedData);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const movieQuery = "jfjeifjwefw";
+  const tempQuery = "mission impossible";
 
   useEffect(() => {
     // * Fetch Movie Data from OMDB
     async function fetchMovies() {
       try {
         setIsLoading(true);
+        setError("");
 
         const response = await fetch(
-          `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDBAPI}&s=${movieQuery}`
+          `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDBAPI}&s=${query}`
         );
+        /**
+         * * Checking response is ok or not. If not, then throw an error.
+         */
         if (!response.ok)
           throw new Error("Something went wrong with the fetching movie Data");
 
         const responseData = await response.json();
+        /**
+         * * Checking movie data is found or not. If not, then throw an error.
+         */
         if (responseData.Response === "False")
           throw new Error("Movie not found, Try another movie");
 
@@ -90,18 +98,25 @@ export default function App() {
       }
     }
 
+    if (query.length < 3) {
+      setMovies([]);
+      setError("");
+
+      return;
+    }
+
     fetchMovies();
 
     return async () => {
       // Cancel any asynchronous operations that are still in progress.
     };
-  }, []);
+  }, [query]);
 
   return (
     <>
       <NavBar>
         <Logo />
-        <Search />
+        <Search query={query} setQuery={setQuery} />
         <NumResults movies={movies} />
       </NavBar>
 
