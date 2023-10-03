@@ -2,7 +2,6 @@ import React from "react";
 import noThumb from "./assets/no-image.png";
 
 const Movie = ({ movie, onSelectedMovie }) => {
-  console.log(movie.Poster);
   const moviePoster = movie.Poster === "N/A" ? noThumb : movie.Poster;
   return (
     <li key={movie.imdbID} onClick={() => onSelectedMovie(movie.imdbID)}>

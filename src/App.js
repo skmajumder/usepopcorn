@@ -60,7 +60,7 @@ const tempWatchedData = [
 ];
 
 export default function App() {
-  const [query, setQuery] = useState("interstellar");
+  const [query, setQuery] = useState("mission impossible");
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -84,6 +84,9 @@ export default function App() {
   }
 
   useEffect(() => {
+    // * AbortController, to abort an asynchronous operation
+    const controller = new AbortController();
+
     // * Fetch Movie Data from OMDB
     async function fetchMovies() {
       try {
@@ -91,7 +94,8 @@ export default function App() {
         setError("");
 
         const response = await fetch(
-          `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDBAPI}&s=${query}`
+          `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDBAPI}&s=${query}`,
+          { signal: controller.signal }
         );
         /**
          * * Checking response is ok or not. If not, then throw an error.
@@ -107,8 +111,11 @@ export default function App() {
           throw new Error("Movie not found, Try another movie");
 
         setMovies(responseData?.Search);
+        setError("");
       } catch (error) {
-        setError(error.message);
+        if (error.name !== "AbortError") {
+          setError(error.message);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -123,8 +130,9 @@ export default function App() {
 
     fetchMovies();
 
-    return async () => {
+    return function () {
       // Cancel any asynchronous operations that are still in progress.
+      controller.abort();
     };
   }, [query]);
 
@@ -155,7 +163,10 @@ export default function App() {
           ) : (
             <>
               <WatchedSummary watched={watched} />
-              <WatchedMoviesList watched={watched} onDeleteWatched={handleDeleteWatched} />
+              <WatchedMoviesList
+                watched={watched}
+                onDeleteWatched={handleDeleteWatched}
+              />
             </>
           )}
         </Box>

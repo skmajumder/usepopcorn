@@ -41,12 +41,18 @@ const MovieDetails = ({ selectedID, onCloseMovie, onAddWatched, watched }) => {
   }
 
   useEffect(() => {
+    // * AbortController, to abort an asynchronous operation
+    const controller = new AbortController();
+
     const fetchMovieDetails = () => {
       return new Promise(async (resolve, reject) => {
         try {
           setIsLoading(true);
           const response = await fetch(
-            `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDBAPI}&i=${selectedID}`
+            `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDBAPI}&i=${selectedID}`,
+            {
+              signal: controller.signal,
+            }
           );
 
           if (!response.ok) {
@@ -74,9 +80,18 @@ const MovieDetails = ({ selectedID, onCloseMovie, onAddWatched, watched }) => {
       });
 
     return () => {
-      // Cleanup function
+      controller.abort();
     };
   }, [selectedID]);
+
+  useEffect(() => {
+    if (!title) return;
+    document.title = `Movie | ${title}`;
+
+    return () => {
+      document.title = "usePopcorn";
+    };
+  }, [title]);
 
   return (
     <div className="details">
@@ -117,7 +132,9 @@ const MovieDetails = ({ selectedID, onCloseMovie, onAddWatched, watched }) => {
                   )}
                 </>
               ) : (
-                <p>You Rated this movie <span>🌟</span> {watchedUserRating}</p>
+                <p>
+                  You Rated this movie <span>🌟</span> {watchedUserRating}
+                </p>
               )}
             </div>
             <p>
