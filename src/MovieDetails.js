@@ -108,6 +108,7 @@ const MovieDetails = ({ selectedID, onCloseMovie, onAddWatched, watched }) => {
     };
   }, [onCloseMovie]);
 
+
   return (
     <div className="details">
       {isLoading ? (
