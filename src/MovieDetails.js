@@ -76,7 +76,9 @@ const MovieDetails = ({ selectedID, onCloseMovie, onAddWatched, watched }) => {
         setMovie(movieData);
       })
       .catch((error) => {
-        console.error(error);
+        if (error.name !== "AbortError") {
+          console.log(error.message);
+        }
       });
 
     return () => {
@@ -92,6 +94,19 @@ const MovieDetails = ({ selectedID, onCloseMovie, onAddWatched, watched }) => {
       document.title = "usePopcorn";
     };
   }, [title]);
+
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === "Escape") {
+        onCloseMovie();
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onCloseMovie]);
 
   return (
     <div className="details">
