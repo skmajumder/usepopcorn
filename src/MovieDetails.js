@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import StarRating from "./StarRating";
 import Loader from "./Loader";
 
@@ -6,6 +6,9 @@ const MovieDetails = ({ selectedID, onCloseMovie, onAddWatched, watched }) => {
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState("");
+
+  const countRef = useRef(0);
+  console.log(countRef.current);
 
   const isWatched = watched.map((w) => w.imdbID).includes(selectedID);
   const watchedUserRating = watched.find(
@@ -34,6 +37,7 @@ const MovieDetails = ({ selectedID, onCloseMovie, onAddWatched, watched }) => {
       runtime: Number(runtime.split(" ").at(0)),
       imdbRating: Number(imdbRating),
       userRating,
+      countRatingDecision: countRef.current,
     };
 
     onAddWatched(newWatchedMovie);
@@ -108,6 +112,12 @@ const MovieDetails = ({ selectedID, onCloseMovie, onAddWatched, watched }) => {
     };
   }, [onCloseMovie]);
 
+  useEffect(() => {
+    if (userRating) countRef.current += 1;
+
+    return () => {};
+  }, [userRating]);
+
   return (
     <div className="details">
       {isLoading ? (
@@ -131,7 +141,7 @@ const MovieDetails = ({ selectedID, onCloseMovie, onAddWatched, watched }) => {
               </p>
             </div>
           </header>
-          
+
           <section>
             <div className="rating">
               {!isWatched ? (
