@@ -4,21 +4,25 @@ const Search = ({ query, setQuery }) => {
   const inputEl = useRef(null);
 
   useEffect(() => {
-    inputEl.current.focus();
-  }, []);
+    function callbackfn(e) {
+      if (document.activeElement === inputEl.current) return;
 
-  // useEffect(() => {
-  //   const el = document.querySelector(".search");
-  //   console.log(el);
-  //   el.focus();
-  // }, []);
+      if (e.code === "Enter") {
+        inputEl.current.focus();
+        setQuery("");
+      }
+    }
+    document.addEventListener("keydown", callbackfn);
+
+    return () => document.removeEventListener("keydown", callbackfn);
+  }, [setQuery]);
 
   return (
     <>
       <input
         className="search"
         type="search"
-        placeholder="Search movies..."
+        placeholder="Search Movies...or Press 'Enter'"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         ref={inputEl}
