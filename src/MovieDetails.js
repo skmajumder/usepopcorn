@@ -108,7 +108,6 @@ const MovieDetails = ({ selectedID, onCloseMovie, onAddWatched, watched }) => {
     };
   }, [onCloseMovie]);
 
-
   return (
     <div className="details">
       {isLoading ? (
@@ -132,6 +131,7 @@ const MovieDetails = ({ selectedID, onCloseMovie, onAddWatched, watched }) => {
               </p>
             </div>
           </header>
+          
           <section>
             <div className="rating">
               {!isWatched ? (
