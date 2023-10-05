@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import StarRating from "./StarRating";
 import Loader from "./Loader";
+import useKey from "./hooks/useKey";
 
 const MovieDetails = ({ selectedID, onCloseMovie, onAddWatched, watched }) => {
   const [movie, setMovie] = useState({});
@@ -8,7 +9,6 @@ const MovieDetails = ({ selectedID, onCloseMovie, onAddWatched, watched }) => {
   const [userRating, setUserRating] = useState("");
 
   const countRef = useRef(0);
-  console.log(countRef.current);
 
   const isWatched = watched.map((w) => w.imdbID).includes(selectedID);
   const watchedUserRating = watched.find(
@@ -43,6 +43,8 @@ const MovieDetails = ({ selectedID, onCloseMovie, onAddWatched, watched }) => {
     onAddWatched(newWatchedMovie);
     onCloseMovie();
   }
+
+  useKey("Escape", onCloseMovie);
 
   useEffect(() => {
     // * AbortController, to abort an asynchronous operation
@@ -98,19 +100,6 @@ const MovieDetails = ({ selectedID, onCloseMovie, onAddWatched, watched }) => {
       document.title = "usePopcorn";
     };
   }, [title]);
-
-  useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === "Escape") {
-        onCloseMovie();
-      }
-    }
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [onCloseMovie]);
 
   useEffect(() => {
     if (userRating) countRef.current += 1;

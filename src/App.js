@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Main from "./Main";
 import NavBar from "./NavBar";
 import Logo from "./Logo";
